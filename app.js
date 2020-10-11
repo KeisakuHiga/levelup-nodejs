@@ -5,7 +5,7 @@ const numCPUs = require('os').cpus().length;
 
 
 if (cluster.isMaster) {
-  console.log(`master ${process.pid} is running`);
+  console.log(`master ${process.pid} is running!!!`);
 
   // create worker(s) as the number of CPU core by forking cluster
   for (let i = 0; i < numCPUs; i++) {
@@ -14,7 +14,7 @@ if (cluster.isMaster) {
 
   // catch the end of worker
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker ${worker.process.pid} died`);
+    console.log(`worker ${worker.process.pid} died...`);
     console.log(`exit ${code} : ${signal}`);
     // create a worker when an unexpected end occur
     if (code !== 0 && !worker.exitedAfterDisconnect) {

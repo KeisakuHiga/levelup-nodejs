@@ -168,3 +168,67 @@ Node.jsは更にコンピュータのCPUとかメモリとかのリソース活�
 ちなみに、この小話は人から聞いて自分なりの解釈を書いているだけだから詳細が間違っているかもしれないから、今後この辺は勉強していきたいと思う。（間違っているところあったら教えてください...）
 
 ### プロセスマネージャー
+> アプリケーション・サーバーに似ていて、デプロイメントを容易に行えるようにして、可溶性を実現し、アプリケーションを実行時に管理できるようにする、アプリケーションの「コンテナー」です。
+
+
+#### デーモンって何？
+第一印象は、「まじ悪いやつ」だよね。間違いない。  
+> デーモンを一言で表現するならば、常駐プログラムとして動作するバックグラウンドプロセス、です。
+
+はぁ。普通にnodeを起動すると*フォアグラウンドプロセス*になるらしい。  
+
+参考：  
+* [フォアグラウンド（foreground）](https://wa3.i-3-i.info/word12543.html)  
+人間が見えるところでプログラムが作業している場所。一番手前（にあるウィンドウ）  
+* [バックグラウンド（background）](https://wa3.i-3-i.info/word11045.html)
+> コンピュータソフトウェアのプロセスにおいて、バックグラウンドは相対的に低い優先度で動作し、入力がごく少ないか全くなく、最小限の出力を行うプロセスを表す。(wiki)
+
+nodeをバックグラウンドプロセスとして起動するには`&`を後ろに付けるとOK
+```bash
+$ node app.js &
+[1] 90694　// 生成されたバックグラウンドプロセスのIDが出力される
+```
+
+#### プロセスマネージャーと使ったデーモン化の利点
+* アプリケーションが異常終了した場合に自動的に再始動する（高可溶性の実現）
+* ランタイム・パフォーマンスとリソース使用料に関するインサイトを得る
+* パフォーマンスを向上させる為に設定を動的に変更する
+* クラスタリングを制御する
+
+#### [Express及びその他のNode.jsアプリ用の一般的なプロセスマネージャー](https://expressjs.com/ja/advanced/pm.html)
+* [Forever](https://github.com/foreverjs/forever)
+> Forever は、特定のスクリプトが確実に継続的 (永続的) に実行されるようにするための単純なコマンド・ライン・インターフェース・ツールです。Forever のインターフェースは単純であるため、Node.js アプリケーションおよびスクリプトの小規模なデプロイメントを実行するのに理想的です。
+
+```bash
+$ forever start app.js 
+$ forever logs
+$ forever list
+$ ps aux | grep app.js 
+$ kill 3220
+$ ps aux | grep app.js 
+$ forever logs app.js 
+data:    app.js:3217 - master 3217 is running
+data:    app.js:3217 - worker 3218 started
+data:    app.js:3217 - worker 3219 started
+data:    app.js:3217 - worker 3221 started
+data:    app.js:3217 - worker 3220 started
+data:    app.js:3217 - worker 3220 died
+data:    app.js:3217 - exit null : SIGTERM
+data:    app.js:3217 - worker 3291 started
+```
+* オプションコマンド
+```bash
+$ forever start --watch app.js // --watchオプションおかげで
+$ forever logs app.js // 例えばapp.jsのコードに変更を加えてもログが残る。
+```
+* [PM2](https://github.com/Unitech/pm2)
+> PM2 は、ロード・バランサーが組み込まれた、Node.js アプリケーション用の実動プロセス・マネージャーです。PM2 では、アプリケーションの稼働を永続的に維持して、ダウン時間を発生させずに再ロードすることができ、共通のシステム管理タスクを簡単に実行できます。PM2 では、アプリケーションのロギング、モニター、クラスタリングを管理することもできます。
+
+
+* [StrongLoop Process Manager](http://strong-pm.io/)
+> StrongLoop Process Manager (StrongLoop PM) は、Node.js アプリケーション用の実動プロセス・マネージャーです。StrongLoop PM には、ロード・バランシング、モニター、マルチホスト・デプロイメント、およびグラフィカル・コンソールが組み込まれています。
+* [systemd](https://www.axllent.org/docs/nodejs-service-with-systemd/)
+>SystemDは現代のLinuxディストリビューションにおける、デフォルトのプロセスマネージャです。SystemDに基づいたノードサービスの実行は非常に簡単です。
+
+→→ [PM2 vs Forever vs StrongLoop PM 比較表](http://strong-pm.io/compare/)
+
